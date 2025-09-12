@@ -7,7 +7,7 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'http://localhost:5173',
-      'https://mycarvalue-front-end-parcel.vercel.app/',
+      'https://mycarvalue-front-end-parcel.vercel.app',
     ],
     methods: ['POST', 'GET', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
