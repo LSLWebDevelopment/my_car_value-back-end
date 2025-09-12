@@ -9,7 +9,7 @@ async function bootstrap() {
       'http://localhost:5173',
       'https://mycarvalue-front-end-parcel.vercel.app/',
     ],
-    methods: ['POST', 'GET', 'PATCH', 'DELETE', 'PUT', 'OPTIONS'],
+    methods: ['POST', 'GET', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
