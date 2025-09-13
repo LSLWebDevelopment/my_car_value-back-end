@@ -33,6 +33,7 @@ export class UsersController {
 
   @Post('signup')
   createUser(@Body() body: CreateUserDto) {
+    console.log('Running the HANDLER');
     return this.usersService.createUser(body.email, body.password);
   }
 
