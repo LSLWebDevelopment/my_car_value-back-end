@@ -1,0 +1,26 @@
+*******Notes on how to create a custom Interceptor form out application*******
+What is an Interceptor:
+Interceptors can be used to intercept outgoing response or incoming requests. An interceptor can be applyed to a single route, all routes in a controller or globally.
+
+Serialize data using the NestJS recomended approach
+1-) On your Entity apply the Decorator @Exclude() to the properties you want to exclude from the response
+
+2-) On your Controller apply the Decorator @UseInterceptors(ClassSerializerInterceptor) with the  ClassSerializerInterceptor argument.
+Obs: there is a down side to this approach that is if we decide to create other routes that uses the same service that gets information from the same Entity we don't have a way to hide information from a specific route. In one route we want respond with 5 pieces of data and on the other one we want to respond with just 2 pieces of data.  
+
+Serialize data using a custom Interceptor that is going to use Dtos to decide which data to send in a response. Every time we want to send out a different set of data in a particular route that uses the same Entity, we create a Dto to define what we want to send on that route.
+
+Creating an custom Interceptor
+1-) Create as custo Dto that uses the @Expose() decorator to define which data should be sent out from   the Entity
+
+2-) Define a class that is going to be our custom Interceptor. This class is going to have an expecific method called intercept that receives 2 arguments: context: ExecutionContext, next: CallHandler. The ExecutionContext has information on the incoming request. The CallHandler is kind of a reference to the request handler in our controller. The class must implements the NestInterceptor interface. Also define an constructor so that we can inject the Dto on the fly. This way our interceptor can work with any dto.
+
+3-) Import into the class the following helpers: UseInterceptors, NestInterceptor, ExecutionContext, CallHandler, these ones come from the @nestjs/common. Also import the: Observable from 'rxjs', map from 'rxjs/operators and plainToClass from 'class-transformer
+
+4-) Inside the class, every code we want to execute before the request is handled by the handler, we put the code before the return statement. And every code we want to run before the response is sent out, we put the code inside the arrow function in the map. 
+
+5-) Inside the arrow function of the map we return our data serialize using the plainToClass function that we imported from the class-transformer and we pass to it out userDto, the data received and a configurator object with a single property called: excludeExtraneousValues: true 
+
+6-) Create a custom decorator in the class to simplify the line used in our controller, just to transform this long line "@UseInterceptors(new SerializeIntereptor(UserDto))" in this @Serialize(UserDto)
+
+7-) Define an interface to type the Dto we are receiving at least to some point, to make sure that we are receiving an class. Sintaxe => new (...args: any[]):{}

@@ -8,14 +8,13 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { UserDto } from './dtos/user.dto';
 import { UsersService } from './users.service';
+import { Serialize } from 'src/interceptors/serialize.interceptor';
+import { UserDto } from './dtos/user.dto';
 
 @Controller('/auth')
-@Serialize(UserDto)
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
@@ -32,13 +31,14 @@ export class UsersController {
   }
 
   @Post('/signup')
+  @Serialize(UserDto)
   createUser(@Body() body: CreateUserDto) {
     return this.usersService.createUser(body.email, body.password);
   }
 
   @Get('/:id')
+  @Serialize(UserDto)
   getUserById(@Param('id') id: string) {
-    console.log('Handler is running...');
     return this.usersService.findUserById(parseInt(id));
   }
 
