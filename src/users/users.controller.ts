@@ -13,10 +13,14 @@ import { UpdateUserDto } from './dtos/update-user.dto';
 import { UsersService } from './users.service';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
+import { AuthenticationService } from './authentication.service';
 
 @Controller('/auth')
 export class UsersController {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private authService: AuthenticationService,
+  ) {}
 
   @Get('/all')
   getAllUsers() {
@@ -25,15 +29,16 @@ export class UsersController {
   }
 
   @Get('/by-email')
-  getUserByEmail(@Query('email') email: string) {
-    console.log('Calling findUserByEmail with: ', email);
-    return this.usersService.findUserByEmail(email);
+  async getUserByEmail(@Query('email') email: string) {
+    // console.log('Calling findUserByEmail with: ', email);
+    return await this.usersService.findUserByEmail(email);
   }
 
   @Post('/signup')
   @Serialize(UserDto)
-  createUser(@Body() body: CreateUserDto) {
-    return this.usersService.createUser(body.email, body.password);
+  async createUser(@Body() body: CreateUserDto) {
+    const user = await this.authService.signUp(body.email, body.password);
+    return user;
   }
 
   @Get('/:id')

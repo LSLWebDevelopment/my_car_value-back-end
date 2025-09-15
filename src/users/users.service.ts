@@ -35,7 +35,7 @@ export class UsersService {
 
   async findUserByEmail(email: string) {
     const user = await this.repository.findOneBy({ email });
-    if (!user) {
+    if (user) {
       throw new NotFoundException(
         `There is no user with email ${email} on the database`,
       );
