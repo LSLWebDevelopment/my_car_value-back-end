@@ -2,8 +2,11 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
+const cookieSession = require('cookie-session');
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.use(cookieSession({ keys: ['asdf'] }));
   app.enableCors({
     origin: [
       'https://my-car-value-front-end.vercel.app', // your frontend

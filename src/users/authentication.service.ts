@@ -33,14 +33,19 @@ export class AuthenticationService {
 
   async signIn(email: string, password: string) {
     const storedUser = await this.repository.findOneBy({ email });
+
     if (!storedUser) {
-      throw new BadRequestException('Bad credential.');
+      throw new BadRequestException('Bad credential. Wrong email');
     }
-    const [salt, storedPassword] = storedUser.password;
+
+    const [salt, storedPassword] = storedUser.password.split('.');
+
     const hashedPassword = (await scrypt(password, salt, 32)) as Buffer;
+
     if (storedPassword !== hashedPassword.toString('hex')) {
-      throw new BadRequestException('Bad credentials.');
+      throw new BadRequestException('Bad credentials. Wrong password');
     }
+
     return storedUser;
   }
 }

@@ -3,10 +3,12 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   Patch,
   Post,
   Query,
+  Session,
 } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
@@ -14,13 +16,25 @@ import { UsersService } from './users.service';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
 import { AuthenticationService } from './authentication.service';
+import { SignInUserDto } from './dtos/signIn-user.dto';
 
 @Controller('/auth')
+@Serialize(UserDto)
 export class UsersController {
   constructor(
     private usersService: UsersService,
     private authService: AuthenticationService,
   ) {}
+
+  @Get('/colors/:color')
+  setColor(@Param('color') color: string, @Session() session: any) {
+    session.color = color;
+  }
+
+  @Get('/colors')
+  getColor(@Session() session: any) {
+    return session.color;
+  }
 
   @Get('/all')
   getAllUsers() {
@@ -35,14 +49,32 @@ export class UsersController {
   }
 
   @Post('/signup')
-  @Serialize(UserDto)
-  async createUser(@Body() body: CreateUserDto) {
+  async createUser(@Body() body: CreateUserDto, @Session() session: any) {
     const user = await this.authService.signUp(body.email, body.password);
+    session.userId = user.id;
     return user;
   }
 
+  @Post('/signIn')
+  @HttpCode(200)
+  async signIn(@Body() body: SignInUserDto, @Session() session: any) {
+    const user = await this.authService.signIn(body.email, body.password);
+    session.userId = user.id;
+    return user;
+  }
+
+  @Post('signOut')
+  @HttpCode(200)
+  signOut(@Session() session: any) {
+    session.userId = null;
+  }
+
+  @Get('/whoAmI')
+  whoAmI(@Session() session: any) {
+    return this.usersService.findUserById(session.userId);
+  }
+
   @Get('/:id')
-  @Serialize(UserDto)
   getUserById(@Param('id') id: string) {
     return this.usersService.findUserById(parseInt(id));
   }

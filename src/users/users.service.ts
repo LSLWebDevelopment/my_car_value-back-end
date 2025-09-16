@@ -14,7 +14,9 @@ export class UsersService {
 
   async findUserById(id: number) {
     const user = await this.repository.findOneBy({ id });
-    if (!user) {
+    if (!id) {
+      return null;
+    } else if (!user) {
       throw new NotFoundException(
         `There is no user with id ${id} on the database`,
       );
@@ -24,12 +26,26 @@ export class UsersService {
 
   async updateUser(id: number, attrs: Partial<User>) {
     const user = await this.findUserById(id);
+
+    if (!user) {
+      throw new NotFoundException(
+        `There is no user with id ${id} on the database`,
+      );
+    }
+
     Object.assign(user, attrs);
     return this.repository.save(user);
   }
 
   async removeUser(id: number) {
     const user = await this.findUserById(id);
+
+    if (!user) {
+      throw new NotFoundException(
+        `There is no user with id ${id} on the database`,
+      );
+    }
+
     return this.repository.remove(user);
   }
 
